@@ -1,0 +1,47 @@
+.layer-list {
+  flex: 1;
+  background: #eee;
+  user-select: none;
+}
+
+.layer-list li p.layer-item {
+  height: 2em;
+  padding-left: 1em;
+}
+
+.layer-list li {
+  list-style-type: none;
+}
+
+.layer-list ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.layer-list .layer-item:hover {
+}
+
+.layer-list .layer-item .eye {
+  opacity: 0.0;
+}
+
+.layer-list .layer-item:hover .eye {
+  opacity: 0.5;
+}
+
+.layer-item {
+  display: flex;
+}
+
+.layer-item .name {
+  flex: 1;
+}
+
+.layer-item-selected {
+  color: white;
+  background: blue;
+}
+
+.layer-item .eye:hover {
+  opacity: 1.0;
+}
