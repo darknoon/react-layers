@@ -9,71 +9,82 @@ const propsDef = {
   backgroundColor: {type: Types.Color, defaultValue: 'transparent'},
 }
 
-function editorForType(t) {
-  return <ColorEditor />
+class ColorEditor extends Component {
+
+  focus = () => this.input.focus();
+
+  textChanged = (event) =>  {
+    this.props.changeValue(event.target.value);
+  }
+
+  render() {
+    const size = 20;
+    return (
+      <div style={{display:'flex'}}>
+        <svg width={size} height={size} fill={this.props.value} onClick={this.focusInput}>
+          <circle cx={size/2} cy={size/2} r={size/2}/>
+        </svg>
+        <div style={{flex:'1'}}>
+          <input 
+            className='prop-editor-text'
+            value={this.props.value}
+            onChange={this.textChanged} />
+        </div>
+      </div>);
+  }
 }
 
-class TextEditor extends Component {
+class PropertyEditor extends Component {
+
   constructor(props) {
     super(props);
-    this.state = {text: props.text};
+    this.state = {value: props.value || null};
   }
 
-  textChanged = (event) => {
-    this.setState({text: event.target.value});
+  changeValue = value => {
+    this.setState({value});
+    this.props.onSetLayerStyle(this.props.layer, this.props.propertyName, value);
   }
+
+  focus = () => this.impl.focus();
 
   render() {
+    const {propertyName, type} = this.props;
     return (
       <div>
-        <input 
-          className='prop-editor-text'
-          type='color'
+        <h3>{propertyName}</h3>
+        <ColorEditor
+          ref={i => this.impl = i}
+          {...this.props}
           value={this.state.value}
-          onChange={this.textChanged} />
+          changeValue={this.changeValue} />
       </div>
     );
   }
-}
-
-class ColorEditor extends Component {
-  render() {
-    return (
-      <div>
-        <TextEditor value={this.props.value} />
-      </div>
-    );
-  }
-}
-
-function PropertyEditor(props) {
-  const {propertyName, type} = props;
-  return (
-    <div key={propertyName}>
-      <h3>{propertyName}</h3>
-      <ColorEditor {...props} />
-    </div>
-  );
 }
 
 export default class Properties extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   render() {
-    const {inspectedLayers} = this.props;
+    const {inspectedLayers, onSetLayerStyle} = this.props;
 
     if (inspectedLayers.length === 0) {
       return <div id='properties'>No selection</div>;
     }
+    // For now, just grab the first inspected layer and use its properties
     const [inspectedLayer] = inspectedLayers;
-    const style = inspectedLayer.style || {};
+    const {style = {}, key, name} = inspectedLayer;
 
     return (
-      <div id='properties'>
+      <div id='properties' key={key}>
+        <p>{name} properties</p>
         {Object.keys(propsDef).map( k =>
-          <PropertyEditor key={k} propertyName={k} type={propsDef[k].type} value={style[k] || propsDef[k].defaultValue} />
+          <PropertyEditor key={k}
+          propertyName={k}
+          type={propsDef[k].type}
+          value={style[k] || propsDef[k].defaultValue}
+          onSetLayerStyle={onSetLayerStyle}
+          layer={inspectedLayer}  />
         )}
       </div>
     );

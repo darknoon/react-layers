@@ -15,7 +15,7 @@ sublayers: [
       position: 'absolute',
       top: '100px',
       left: '200px',
-      background: 'red',
+      backgroundColor: 'red',
       width: '300px',
       height: '200px',
     },
@@ -72,6 +72,15 @@ class App extends Component {
 
   }
 
+  setLayerStyle = (layer, propertyName, value) => {
+    // Allow mutability for now. In the future, should really use a proper Map, etc.
+    if (!layer.hasOwnProperty('style')) {
+      layer.style = {};
+    }
+    layer.style[propertyName] = value;
+    this.forceUpdate();
+  }
+
 
   render() {
     const {selection} = this.state;
@@ -79,7 +88,7 @@ class App extends Component {
       <div className='App'>
         <LayerList root={tree} onSelect={this.selectLayer} onToggleVisibility={this.toggleVisibility} selection={selection} />
         <Canvas root={tree} selection={selection} />
-        <Properties inspectedLayers={findSelectedLayers(tree, selection)} />
+        <Properties inspectedLayers={findSelectedLayers(tree, selection)} onSetLayerStyle={this.setLayerStyle} />
       </div>
     );
   }
