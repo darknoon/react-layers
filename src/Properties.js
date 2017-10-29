@@ -3,10 +3,13 @@ import './Properties.css';
 
 const Types = {
   Color: 'color',
+  Length: 'length',
 }
 
 const propsDef = {
   backgroundColor: {type: Types.Color, defaultValue: 'transparent'},
+  width: {type: Types.Length, defaultValue: '100px'},
+  height: {type: Types.Length, defaultValue: '100px'},
 }
 
 class ColorEditor extends Component {
