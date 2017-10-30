@@ -4,8 +4,9 @@
   user-select: none;
 }
 
-.layer-list li p.layer-item {
-  height: 2em;
+.layer-list li .layer-item {
+  display: flex;
+  align-items: center;
   padding-left: 1em;
 }
 
@@ -18,11 +19,8 @@
   padding-left: 16px;
 }
 
-.layer-list .layer-item:hover {
-}
-
 .layer-list .layer-item .eye {
-  opacity: 0.0;
+  opacity: 0;
 }
 
 .layer-list .layer-item:hover .eye {
@@ -37,11 +35,6 @@
   flex: 1;
 }
 
-.layer-item-selected {
-  color: white;
-  background: blue;
-}
-
 .layer-item .eye:hover {
-  opacity: 1.0;
+  opacity: 1;
 }

@@ -43,8 +43,16 @@ export default class CanvasLayer extends Component {
       paddingBottom,
     } = style;
 
-    left = left !== undefined ? left - borderWidth / 2 : undefined;
-    top = top !== undefined ? top - borderWidth / 2 : undefined;
+    const marginForScrolling = 50;
+
+    left =
+      left !== undefined
+        ? left - borderWidth / 2 - marginForScrolling
+        : undefined;
+    top =
+      top !== undefined
+        ? top - borderWidth / 2 - marginForScrolling
+        : undefined;
     width = width !== undefined ? width + borderWidth : undefined;
     height = height !== undefined ? height + borderWidth : undefined;
 
@@ -69,6 +77,7 @@ export default class CanvasLayer extends Component {
           borderStyle: 'solid',
           background: 'transparent',
           display: 'flex',
+          margin: marginForScrolling,
         })}
       >
         <div

@@ -1,7 +1,15 @@
 import React, {Component} from 'react';
 import VisibilityIcon from './visibility-icon';
+import {highlight} from './style/colors';
 
 import './LayerList.css';
+
+const styleSheet = {
+  layerItemSelected: {
+    color: 'white',
+    background: highlight,
+  },
+};
 
 class LayerItem extends Component {
   toggleVisibility = e => {
@@ -12,11 +20,13 @@ class LayerItem extends Component {
   render() {
     let {selected, name, onSelect} = this.props;
     let cls = 'layer-item';
-    if (selected) {
-      cls += ' layer-item-selected';
-    }
+
     return (
-      <div className={cls} onMouseDown={onSelect}>
+      <div
+        className={cls}
+        style={selected ? styleSheet.layerItemSelected : null}
+        onMouseDown={onSelect}
+      >
         <span className="name">{name}</span>
         <span onClick={this.toggleVisibility}>
           <VisibilityIcon className="eye" fill={selected ? 'white' : 'black'} />
