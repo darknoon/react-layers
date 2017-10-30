@@ -13,6 +13,20 @@ const propsDef = {
   height: {type: Types.Length, defaultValue: '100px'},
 };
 
+const r = 10;
+const ColorDot = ({onClick, color}) => (
+  <svg width={2 * r + 2} height={2 * r + 2} onClick={onClick}>
+    <circle fill={color} cx={r + 1} cy={r + 1} r={r - 0.5} />
+    <circle
+      fill="transparent"
+      stroke="rgba(0,0,0,0.2)"
+      cx={r + 1}
+      cy={r + 1}
+      r={r}
+    />
+  </svg>
+);
+
 class ColorEditor extends Component {
   state = {
     displayColorPicker: false,
@@ -34,13 +48,13 @@ class ColorEditor extends Component {
   handleClose = e => this.setState({displayColorPicker: false});
 
   render() {
-    const size = 20;
     const {value} = this.props;
     const {displayColorPicker} = this.state;
 
     const popover = {
       position: 'absolute',
       zIndex: '2',
+      right: 0,
     };
     const cover = {
       position: 'fixed',
@@ -50,27 +64,17 @@ class ColorEditor extends Component {
       left: '0px',
     };
 
-    return (
-      <div style={{display: 'flex'}}>
-        <svg
-          width={size}
-          height={size}
-          fill={value}
-          style={{padding: 10}}
-          onClick={this.onClick}
-        >
-          <circle cx={size / 2} cy={size / 2} r={size / 2} />
-        </svg>
-        <div>
-          {displayColorPicker ? (
-            <div style={popover}>
-              <div style={cover} onClick={this.handleClose} />
-              <SketchPicker color={value} onChange={this.colorChanged} />
-            </div>
-          ) : null}
-        </div>
-      </div>
-    );
+    return [
+      <div>
+        <ColorDot color={value} onClick={this.onClick} />
+        {displayColorPicker ? (
+          <div style={popover}>
+            <div style={cover} onClick={this.handleClose} />
+            <SketchPicker color={value} onChange={this.colorChanged} />
+          </div>
+        ) : null}
+      </div>,
+    ];
   }
 }
 
@@ -111,7 +115,15 @@ class LengthEditor extends Component {
 }
 
 const PropertyRow = ({children}) => (
-  <div style={{display: 'flex'}}>{children}</div>
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    }}
+  >
+    {children}
+  </div>
 );
 
 class PropertyEditor extends Component {
@@ -126,7 +138,7 @@ class PropertyEditor extends Component {
     const {propertyName, type, value} = this.props;
     return (
       <PropertyRow>
-        <h3 style={{width: 70}}>{propertyName}</h3>
+        <label>{propertyName}</label>
         {type === Types.Color ? (
           <ColorEditor
             ref={i => (this.impl = i)}
@@ -159,7 +171,7 @@ export default class Properties extends Component {
 
     return (
       <div id="properties" key={key}>
-        <p>{name} properties</p>
+        <h2>{name}</h2>
         {Object.keys(propsDef).map(k => (
           <PropertyEditor
             key={k}

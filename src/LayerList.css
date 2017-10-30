@@ -4,7 +4,7 @@
   user-select: none;
 }
 
-.layer-list li .layer-item {
+.layer-list .layer-item {
   display: flex;
   align-items: center;
   padding-left: 1em;
