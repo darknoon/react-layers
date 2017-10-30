@@ -1,6 +1,6 @@
 // @flow
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import CanvasLayer from './CanvasLayer';
 import type Layer from './Model';
 
@@ -11,24 +11,20 @@ type CanvasProps = {
 export default class Canvas extends Component {
   state: {
     draggingId: ?string,
+  } = {draggingId: null};
+
+  onMouseDown = e => {
+    e.preventDefault();
+    this.setState({draggingId: null});
   };
 
-  constructor(props: CanvasProps) {
-    super(props);
-    this.state = { draggingId: null };
-  }
-
-  // onMouseDown = (e) => {
-  //   e.preventDefault();
-  //   this.setState({draggingId: e.});
-  // }
-
   beginMouseDownOnLayer = (e: Event, l: Layer) => {
-    this.setState({ ...this.state, draggingId: l.ident });
+    this.setState({draggingId: l.ident});
   };
 
   onMouseMove = (e: Event) => {
-    if (this.state.draggingId != null) {
+    const {draggingId} = this.state;
+    if (draggingId != null) {
       // mutate position
       console.log(`update dragging... ${this.state.draggingId}`);
     }
@@ -36,7 +32,7 @@ export default class Canvas extends Component {
 
   onMouseUp = (e: Event) => {
     e.stopPropagation();
-    this.setState({ draggingId: null });
+    this.setState({draggingId: null});
   };
 
   renderTree(l: Layer, selection: Set<string>) {
@@ -58,9 +54,17 @@ export default class Canvas extends Component {
   }
 
   render() {
+    const {root, selection} = this.props;
     return (
-      <div style={{ flex: '3', background: '#999', position: 'relative' }}>
-        {this.renderTree(this.props.root, new Set(['abcd']))}
+      <div
+        style={{
+          flex: '3',
+          background: '#999',
+          position: 'relative',
+          overflow: 'scroll',
+        }}
+      >
+        {this.renderTree(this.props.root, selection)}
       </div>
     );
   }

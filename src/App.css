@@ -1,5 +1,15 @@
-html, body, #root, .App {
+html,
+body,
+#root,
+.App {
   height: 100%;
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
 }
 
 .App {
