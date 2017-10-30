@@ -52,9 +52,15 @@ export default class App extends Component {
   toggleVisibility = (key: string) => {};
 
   setLayerStyle = (layer: Layer, propertyName: string, value: string) => {
-    const {style = {}} = layer;
-    this.setState({
-      tree: replaceLayer({...layer, style: {...style, [propertyName]: value}}),
+    const {style = {}, key} = layer;
+    console.log(`set key ${key}.${propertyName} = ${value}`);
+    this.setState(({tree}) => {
+      const newTree = replaceLayer(tree, key, {
+        ...layer,
+        style: {...style, [propertyName]: value},
+      });
+      console.log('newTree', newTree);
+      return {tree: newTree};
     });
   };
 

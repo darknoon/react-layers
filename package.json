@@ -8,6 +8,7 @@
   "dependencies": {
     "react": "^16.0.0",
     "react-classset": "^0.0.2",
+    "react-color": "^2.13.8",
     "react-dom": "^16.0.0"
   },
   "scripts": {
