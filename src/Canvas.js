@@ -37,18 +37,20 @@ export default class Canvas extends Component {
 
   renderTree(l: Layer, selection: Set<string>) {
     const self = this;
+    const {sublayers, key, style, content} = l;
     const sub = l.sublayers
       ? l.sublayers.map(t => self.renderTree(t, selection))
       : null;
     return (
       <CanvasLayer
-        key={l.key}
-        ident={l.key}
-        style={l.style}
+        key={key}
+        ident={key}
+        style={style}
         beginMouseDownOnLayer={this.beginMouseDownOnLayer}
-        selected={selection.has(l.key)}
+        selected={selection.has(key)}
       >
         {sub}
+        {content}
       </CanvasLayer>
     );
   }

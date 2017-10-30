@@ -18,15 +18,15 @@ class LayerItem extends Component {
   };
 
   render() {
-    let {selected, name, onSelect} = this.props;
-    let cls = 'layer-item';
+    let {selected, name, element, onSelect} = this.props;
 
     return (
       <div
-        className={cls}
+        className="layer-item"
         style={selected ? styleSheet.layerItemSelected : null}
         onMouseDown={onSelect}
       >
+        <span className="element">{element}</span>
         <span className="name">{name}</span>
         <span onClick={this.toggleVisibility}>
           <VisibilityIcon className="eye" fill={selected ? 'white' : 'black'} />
@@ -62,6 +62,7 @@ export default class LayerList extends Component {
       <li key={l.key}>
         <LayerItem
           name={l.name}
+          element={l.element}
           key={l.key}
           selected={selection.has(l.key)}
           onSelect={e => {
