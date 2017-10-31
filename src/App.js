@@ -33,11 +33,13 @@ function replaceLayer(tree: Layer, key: string, replacement: Layer) {
   return tree;
 }
 
-export default class App extends Component {
-  state: {
-    tree: Layer,
-    selection: Set<string>,
-  } = {
+type AppState = {
+  tree: Layer,
+  selection: Set<string>,
+};
+
+export default class App extends Component<void, AppState> {
+  state = {
     tree: defaultTree,
     selection: new Set(['4d175542-ece0-4476-8e71-601a7cd0d3b0']),
   };
@@ -70,6 +72,7 @@ export default class App extends Component {
 
   render() {
     const {selection, tree} = this.state;
+
     return (
       <div className="App">
         <LayerList

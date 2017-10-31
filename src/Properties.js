@@ -64,7 +64,7 @@ class ColorEditor extends Component {
       left: '0px',
     };
 
-    return [
+    return (
       <div>
         <ColorDot color={value} onClick={this.onClick} />
         {displayColorPicker ? (
@@ -73,8 +73,8 @@ class ColorEditor extends Component {
             <SketchPicker color={value} onChange={this.colorChanged} />
           </div>
         ) : null}
-      </div>,
-    ];
+      </div>
+    );
   }
 }
 

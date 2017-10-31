@@ -8,6 +8,8 @@ export type Layer = {|
   style: {[k: string]: any},
 |};
 
+const registry = {};
+
 export const defaultTree = {
   name: '_root_',
   key: 'a17d02a2-d5bf-4def-a171-49de6400859f',
@@ -47,7 +49,7 @@ export const defaultTree = {
       element: 'div',
       style: {
         position: 'absolute',
-        top: 600,
+        top: 900,
         left: 200,
         backgroundColor: 'blue',
         width: 300,
@@ -59,6 +61,15 @@ export const defaultTree = {
       key: '8c8fbec4-873b-4710-8a8c-86a57e8c0db5',
       element: 'div',
       name: 'Third Layer',
+      style: {
+        position: 'absolute',
+        top: 400,
+        left: 800,
+        backgroundColor: 'black',
+        width: 300,
+        height: 200,
+        padding: 20,
+      },
     },
   ],
 };
