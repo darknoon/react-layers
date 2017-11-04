@@ -3,7 +3,7 @@
 import React, {Component} from 'react';
 import CanvasLayer from './CanvasLayer';
 import type Layer from './Model';
-import {highlight} from './style/colors';
+import {highlight, canvasBackground} from './style/colors';
 
 const borderWidth = 3;
 
@@ -225,7 +225,7 @@ export default class Canvas extends Component<
       <div
         style={{
           flex: '3',
-          background: '#999',
+          background: canvasBackground,
           position: 'relative',
           overflow: 'scroll',
         }}

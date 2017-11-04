@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react';
 import VisibilityIcon from './visibility-icon';
-import {highlight} from './style/colors';
+import {highlight, layerListBackground} from './style/colors';
 import {Key} from 'ts-keycode-enum';
 
 import './LayerList.css';
@@ -108,6 +108,7 @@ export default class LayerList extends PureComponent {
         onMouseDown={e => this.selectLayer(new Set())}
         onKeyDown={this.onKeyDown}
         tabIndex={0}
+        style={{backgroundColor: layerListBackground}}
       >
         {rows.map(({layer: l, indent}) => (
           <LayerItem
