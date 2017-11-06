@@ -2,40 +2,76 @@ import React, {PureComponent} from 'react';
 import VisibilityIcon from './visibility-icon';
 import {highlight, layerListBackground} from './style/colors';
 import {Key} from 'ts-keycode-enum';
-
-import './LayerList.css';
+import styled from 'styled-components';
 
 const indentSize = 20;
 
-const styleSheet = {
-  layerItemSelected: {
-    color: 'white',
-    background: highlight,
-  },
-};
+const LayerItemWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  padding-left: 1em;
+  color: ${({selected}) => (selected ? 'white' : 'inherit')};
+  background: ${({selected}) => (selected ? highlight : 'inherit')};
+`;
+
+const LayerName = styled.span`
+  flex: 1;
+  padding-left: 2px;
+`;
+
+const LayerElement = styled.span`
+  font-size: 80%;
+  padding: 2px 4px;
+  background-color: white;
+  color: black;
+  min-width: 2em;
+  text-align: center;
+  border-radius: 999px;
+`;
+
+const Eye = styled.span`
+  opacity: ${({rowHovered}) => (rowHovered ? 0.5 : 0)};
+  :hover {
+    opacity: 1;
+  }
+`;
+
+const Indent = styled.span`width: ${props => props.width}px;`;
 
 class LayerItem extends PureComponent {
+  state = {hovered: false};
+
   toggleVisibility = e => {
     e.stopPropagation();
     this.props.onToggleVisibility();
   };
 
+  onMouseEnter = (e: MouseEvent<HTMLSpanElement>) => {
+    this.setState({hovered: true});
+  };
+
+  onMouseLeave = (e: MouseEvent<HTMLSpanElement>) => {
+    this.setState({hovered: false});
+  };
+
   render() {
-    let {selected, name, element, onSelect, indent} = this.props;
+    const {selected, name, element, onSelect, indent} = this.props;
+    const {hovered} = this.state;
 
     return (
-      <div
-        className="layer-item"
-        style={selected ? styleSheet.layerItemSelected : null}
+      <LayerItemWrapper
+        selected={selected}
         onMouseDown={onSelect}
+        onMouseEnter={this.onMouseEnter}
+        onMouseLeave={this.onMouseLeave}
       >
-        <span style={{width: indent * indentSize}} />
-        <span className="element">{element}</span>
-        <span className="name">{name}</span>
-        <span onClick={this.toggleVisibility}>
+        <Indent width={indent * indentSize} />
+        <LayerElement>{element}</LayerElement>
+        <LayerName>{name}</LayerName>
+        <Eye onClick={this.toggleVisibility} rowHovered={hovered}>
           <VisibilityIcon className="eye" fill={selected ? 'white' : 'black'} />
-        </span>
-      </div>
+        </Eye>
+      </LayerItemWrapper>
     );
   }
 }
@@ -53,14 +89,12 @@ function treeToRows(l: Layer) {
   return recur(l, -1);
 }
 
-export default class LayerList extends PureComponent {
-  constructor(props) {
-    super(props);
-    if (!props.selection instanceof Set) {
-      throw new Error('missing selection');
-    }
-  }
+const Wrapper = styled.div`
+  flex: 1;
+  user-select: none;
+`;
 
+export default class LayerList extends PureComponent {
   selectLayer = key => {
     this.props.onSelect(key);
   };
@@ -72,8 +106,10 @@ export default class LayerList extends PureComponent {
   onKeyDown = (e: KeyboardEvent) => {
     if (e.keyCode === Key.UpArrow) {
       this.onNavigate(-1);
+      e.stopPropagation();
     } else if (e.keyCode === Key.DownArrow) {
       this.onNavigate(1);
+      e.stopPropagation();
     }
   };
 
@@ -103,8 +139,7 @@ export default class LayerList extends PureComponent {
     const selectedIndex = rows.findIndex(row => selection.has(row.layer.key));
 
     return (
-      <div
-        className="layer-list"
+      <Wrapper
         onMouseDown={e => this.selectLayer(new Set())}
         onKeyDown={this.onKeyDown}
         tabIndex={0}
@@ -125,7 +160,7 @@ export default class LayerList extends PureComponent {
             onNavigate={this.onNavigate}
           />
         ))}
-      </div>
+      </Wrapper>
     );
   }
 }

@@ -11,35 +11,3 @@ body,
 *:after {
   box-sizing: inherit;
 }
-
-.App {
-  display: flex;
-  align-items: stretch;
-  height: 100%;
-
-  font-size: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-}
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
-}
-
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
-}
-
-.App-intro {
-  font-size: large;
-}
-
-#properties {
-  flex: 1;
-  padding: 20px;
-}

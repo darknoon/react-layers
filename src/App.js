@@ -7,6 +7,7 @@ import Canvas from './Canvas';
 import Properties from './Properties';
 import type Layer from './Model';
 import {defaultTree} from './Model';
+import styled from 'styled-components';
 
 // This could be made a good bit more efficient...
 function findSelectedLayers(tree, selection) {
@@ -37,6 +38,17 @@ type AppState = {
   tree: Layer,
   selection: Set<string>,
 };
+
+const Wrapper = styled.div`
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+
+  font-size: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+`;
 
 export default class App extends Component<void, AppState> {
   state = {
@@ -74,7 +86,7 @@ export default class App extends Component<void, AppState> {
     const {selection, tree} = this.state;
 
     return (
-      <div className="App">
+      <Wrapper>
         <LayerList
           root={tree}
           onSelect={this.selectLayer}
@@ -86,7 +98,7 @@ export default class App extends Component<void, AppState> {
           inspectedLayers={findSelectedLayers(tree, selection)}
           onSetLayerStyle={this.setLayerStyle}
         />
-      </div>
+      </Wrapper>
     );
   }
 }

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {SketchPicker} from 'react-color';
-import './Properties.css';
+import styled from 'styled-components';
 
 const Types = {
   Color: 'color',
@@ -103,11 +103,7 @@ class LengthEditor extends Component {
     return (
       <div style={{display: 'flex'}}>
         <div style={{flex: '1'}}>
-          <input
-            className="prop-editor-text"
-            value={this.props.value}
-            onChange={this.textChanged}
-          />
+          <input value={this.props.value} onChange={this.textChanged} />
         </div>
       </div>
     );
@@ -158,19 +154,24 @@ class PropertyEditor extends Component {
   }
 }
 
+const Wrapper = styled.div`
+  flex: 1;
+  padding: 20px;
+`;
+
 export default class Properties extends Component {
   render() {
     const {inspectedLayers, onSetLayerStyle} = this.props;
 
     if (inspectedLayers.length === 0) {
-      return <div id="properties">No selection</div>;
+      return <Wrapper>No selection</Wrapper>;
     }
     // For now, just grab the first inspected layer and use its properties
     const [inspectedLayer] = inspectedLayers;
     const {style = {}, key, name} = inspectedLayer;
 
     return (
-      <div id="properties" key={key}>
+      <Wrapper key={key}>
         <h2>{name}</h2>
         {Object.keys(propsDef).map(k => (
           <PropertyEditor
@@ -182,7 +183,7 @@ export default class Properties extends Component {
             layer={inspectedLayer}
           />
         ))}
-      </div>
+      </Wrapper>
     );
   }
 }

@@ -1,9 +1,13 @@
 // @flow
 
-import React, {Component} from 'react';
+import * as React from 'react';
 import CanvasLayer from './CanvasLayer';
 import type Layer from './Model';
 import {highlight, canvasBackground} from './style/colors';
+import styled from 'styled-components';
+import ReactDOM from 'react-dom';
+import memoize from './util/memoize';
+import {isEqual} from 'underscore';
 
 const borderWidth = 3;
 
@@ -41,9 +45,6 @@ function elementPositionInContainer(
     bottom: parentBottom,
   } = parent.getBoundingClientRect();
   const {scrollTop, scrollLeft} = parent;
-  console.log('parent: ', {parentLeft, parentTop});
-  console.log('scroll position: ', {scrollTop, scrollLeft});
-
   return {
     left: left - parentLeft + scrollLeft,
     right: right - parentRight,
@@ -89,14 +90,38 @@ const findLayer = (l: Layer, key: string) => {
   return null;
 };
 
-export default class Canvas extends Component<
+const SelectionOverlay = styled.div`
+  pointer-events: none;
+  position: absolute;
+  border: 3px solid ${highlight};
+  border-radius: 3px;
+  background: transparent;
+  display: flex;
+`;
+
+const InnerMarkings = styled.div`
+  flex: 1;
+  borderradius: 3px;
+  border: 1px solid ${highlight};
+  opacity: 0.2;
+`;
+
+const CanvasContainer = styled.div`
+  flex: 3;
+  background: ${canvasBackground};
+  position: relative;
+  overflow: scroll;
+`;
+
+export default class Canvas extends React.PureComponent<
   CanvasProps,
   {
     draggingId: ?string,
+    overlays: {layer: Layer, elementPosition: Rect}[],
   },
 > {
-  state = {draggingId: null};
-  container: ?HTMLDivElement;
+  state = {draggingId: null, overlays: []};
+  container: ?CanvasContainer;
   layerComponents: {[string]: CanvasLayer} = {};
 
   onMouseDown = (e: MouseEvent) => {
@@ -134,11 +159,8 @@ export default class Canvas extends Component<
     } = style;
 
     return (
-      <div
-        key="selectionOverlay"
+      <SelectionOverlay
         style={undefinedToUnset({
-          pointerEvents: 'none',
-          position: 'absolute',
           top,
           left,
           width,
@@ -148,31 +170,14 @@ export default class Canvas extends Component<
           paddingTop,
           paddingRight,
           paddingBottom,
-          borderColor: highlight,
-          borderWidth: 3,
-          borderRadius: 3,
-          borderStyle: 'solid',
-          background: 'transparent',
-          display: 'flex',
         })}
       >
-        <div
-          key="innerMarkings"
-          style={{
-            flex: 1,
-            borderWidth: 1,
-            borderRadius: 3,
-            borderStyle: 'solid',
-            borderColor: highlight,
-            opacity: 0.2,
-          }}
-        />
-      </div>
+        <InnerMarkings />
+      </SelectionOverlay>
     );
   }
 
   registerLayer = (key: string, canvasLayer: CanvasLayer) => {
-    console.log('registering: ', key, canvasLayer);
     const {root} = this.props;
     if (canvasLayer !== null) {
       this.layerComponents[key] = canvasLayer;
@@ -202,38 +207,53 @@ export default class Canvas extends Component<
     );
   }
 
+  makeOverlays = memoize(
+    ({root, selection}) =>
+      selection
+        .map(key => {
+          const elem = this.layerComponents[key];
+          const layer = findLayer(root, key);
+          console.log(
+            'overlay ',
+            this.container,
+            ReactDOM.findDOMNode(this.container),
+          );
+          if (elem && layer && this.container) {
+            const elementPosition = elementPositionInContainer(
+              elem,
+              ReactDOM.findDOMNode(this.container),
+            );
+
+            return {layer, elementPosition};
+          } else {
+            return null;
+          }
+        })
+        .filter(o => o),
+    isEqual,
+    isEqual,
+  );
+
+  componentDidUpdate() {
+    const {root, selection} = this.props;
+    const overlays = this.makeOverlays({
+      root,
+      selection: Array.from(selection.values()),
+    });
+    this.setState({overlays});
+  }
+
   render() {
     const {root, selection} = this.props;
-
-    const overlays = Array.from(selection.values()).map(key => {
-      const elem = this.layerComponents[key];
-      const layer = findLayer(root, key);
-      console.log('overlay ', key, root, layer);
-      if (elem && layer && this.container) {
-        const elementPosition = elementPositionInContainer(
-          elem,
-          this.container,
-        );
-
-        return this.selectionOverlay(layer, elementPosition);
-      } else {
-        return null;
-      }
-    });
+    const {overlays} = this.state;
 
     return (
-      <div
-        style={{
-          flex: '3',
-          background: canvasBackground,
-          position: 'relative',
-          overflow: 'scroll',
-        }}
-        ref={ref => (this.container = ref)}
-      >
+      <CanvasContainer ref={ref => (this.container = ref)}>
         {this.renderTree(this.props.root, selection)}
-        {overlays}
-      </div>
+        {overlays.map(({layer, elementPosition}) =>
+          this.selectionOverlay(layer, elementPosition),
+        )}
+      </CanvasContainer>
     );
   }
 }
