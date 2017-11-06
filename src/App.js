@@ -6,7 +6,7 @@ import LayerList from './LayerList';
 import Canvas from './Canvas';
 import Properties from './Properties';
 import type Layer from './Model';
-import {defaultTree} from './Model';
+import {defaultTree, defaultRegistry} from './Model';
 import styled from 'styled-components';
 
 // This could be made a good bit more efficient...
@@ -53,14 +53,13 @@ const Wrapper = styled.div`
 export default class App extends Component<void, AppState> {
   state = {
     tree: defaultTree,
+    registry: defaultRegistry,
     selection: new Set(['4d175542-ece0-4476-8e71-601a7cd0d3b0']),
   };
 
-  selectLayer = (key: string) => {
-    // Key could be null, but Set will deal either way
-    const selection = new Set([key]);
-    let state = {...this.state, selection};
-    this.setState(state);
+  selectLayer = (key: ?string) => {
+    // $FlowFixMe Key could be null, but Set will deal either way
+    this.setState({selection: new Set([key])});
   };
 
   toggleVisibility = (key: string) => {};
@@ -83,7 +82,7 @@ export default class App extends Component<void, AppState> {
   }
 
   render() {
-    const {selection, tree} = this.state;
+    const {selection, tree, registry} = this.state;
 
     return (
       <Wrapper>
@@ -93,7 +92,12 @@ export default class App extends Component<void, AppState> {
           onToggleVisibility={this.toggleVisibility}
           selection={selection}
         />
-        <Canvas root={tree} selection={selection} />
+        <Canvas
+          root={tree}
+          registry={registry}
+          onSelect={this.selectLayer}
+          selection={selection}
+        />
         <Properties
           inspectedLayers={findSelectedLayers(tree, selection)}
           onSetLayerStyle={this.setLayerStyle}

@@ -5,6 +5,7 @@ export default class CanvasLayer extends Component {
     const {beginMouseDownOnLayer, ident} = this.props;
     // tell parent about this event?
     beginMouseDownOnLayer(e, ident);
+    e.stopPropagation();
   };
 
   onMouseOver = e => {};

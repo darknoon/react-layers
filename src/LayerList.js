@@ -19,7 +19,7 @@ const LayerName = styled.span`
   padding-left: 2px;
 `;
 
-const LayerElement = styled.span`
+const LayerType = styled.span`
   font-size: 80%;
   padding: 2px 4px;
   background-color: white;
@@ -55,7 +55,7 @@ class LayerItem extends PureComponent {
   };
 
   render() {
-    const {selected, name, element, onSelect, indent} = this.props;
+    const {selected, name, type, onSelect, indent} = this.props;
     const {hovered} = this.state;
 
     return (
@@ -66,7 +66,7 @@ class LayerItem extends PureComponent {
         onMouseLeave={this.onMouseLeave}
       >
         <Indent width={indent * indentSize} />
-        <LayerElement>{element}</LayerElement>
+        <LayerType>{type}</LayerType>
         <LayerName>{name}</LayerName>
         <Eye onClick={this.toggleVisibility} rowHovered={hovered}>
           <VisibilityIcon className="eye" fill={selected ? 'white' : 'black'} />
@@ -148,7 +148,7 @@ export default class LayerList extends PureComponent {
         {rows.map(({layer: l, indent}) => (
           <LayerItem
             name={l.name}
-            element={l.element}
+            type={l.type}
             indent={indent}
             key={l.key}
             selected={selection.has(l.key)}

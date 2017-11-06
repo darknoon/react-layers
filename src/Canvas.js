@@ -14,6 +14,7 @@ const borderWidth = 3;
 type CanvasProps = {
   selection: Set<string>,
   root: Layer,
+  registry: {[string]: Layer},
 };
 
 type Rect = {
@@ -129,8 +130,10 @@ export default class Canvas extends React.PureComponent<
     this.setState({draggingId: null});
   };
 
-  beginMouseDownOnLayer = (e: Event, l: Layer) => {
-    this.setState({draggingId: l.ident});
+  beginMouseDownOnLayer = (e: Event, key: string) => {
+    const {onSelect} = this.props;
+    this.setState({draggingId: key});
+    onSelect(key);
   };
 
   onMouseMove = (e: Event) => {
@@ -187,10 +190,25 @@ export default class Canvas extends React.PureComponent<
   };
 
   renderTree(l: Layer, selection: Set<string>) {
-    const self = this;
-    const {sublayers, key, style, content} = l;
-    const sub = l.sublayers
-      ? l.sublayers.map(t => self.renderTree(t, selection))
+    const {registry} = this.props;
+    let {sublayers, type, key, style, content} = l;
+
+    // Lookup type in registry
+    const Component = registry[type];
+
+    // TODO: support container components
+    if (Component) {
+      // Components have static children for now
+      const result = Component.render;
+      if (result) {
+        sublayers = result.sublayers;
+        // Merge style from component and component's render
+        style = {...result.style, ...style};
+      }
+    }
+
+    const sub = sublayers
+      ? sublayers.map(t => this.renderTree(t, selection))
       : null;
     return (
       <CanvasLayer
@@ -213,11 +231,6 @@ export default class Canvas extends React.PureComponent<
         .map(key => {
           const elem = this.layerComponents[key];
           const layer = findLayer(root, key);
-          console.log(
-            'overlay ',
-            this.container,
-            ReactDOM.findDOMNode(this.container),
-          );
           if (elem && layer && this.container) {
             const elementPosition = elementPositionInContainer(
               elem,
@@ -242,6 +255,11 @@ export default class Canvas extends React.PureComponent<
     });
     this.setState({overlays});
   }
+
+  deselect = () => {
+    const {onSelect} = this.props;
+    onSelect(null);
+  };
 
   render() {
     const {root, selection} = this.props;
