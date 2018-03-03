@@ -118,50 +118,45 @@ export const defaultRegistry: Registry = {
   },
 };
 
-export const defaultTree = {
-  name: '_root_',
-  key: 'a17d02a2-d5bf-4def-a171-49de6400859f',
-  type: 'div',
-  sublayers: [
-    {
-      name: 'First Layer',
-      key: '4d175542-ece0-4476-8e71-601a7cd0d3b0',
-      type: 'TitledGrid',
-      style: {
-        position: 'absolute',
-        top: 100,
-        left: 200,
-        width: 300,
-        height: 200,
-      },
-    },
-    {
-      key: '27df498c-7d5a-41aa-ba37-e02b9bc2f88f',
-      name: 'Second Layer',
-      type: 'div',
-      style: {
-        position: 'absolute',
-        top: 900,
-        left: 200,
-        backgroundColor: 'blue',
-        width: 300,
-        height: 200,
-        padding: 20,
-      },
-    },
-    {
-      key: '8c8fbec4-873b-4710-8a8c-86a57e8c0db5',
-      type: 'div',
-      name: 'Third Layer',
-      style: {
-        position: 'absolute',
-        top: 400,
-        left: 800,
-        backgroundColor: 'black',
-        width: 300,
-        height: 200,
-        padding: 20,
-      },
-    },
-  ],
-};
+export function treeToRows(l: Layer) {
+  const rowForLayer = (layer: Layer, indent: number) => ({indent, layer});
+
+  const recur = (layer: Layer, indent: number): Row[] => {
+    return (layer.sublayers || []).reduce(
+      (arr, sublayer) => arr.concat(recur(sublayer, indent + 1)),
+      layer !== l ? [rowForLayer(layer, indent)] : [],
+    );
+  };
+
+  return recur(l, -1);
+}
+export function flattenTree(
+  layer: Layer,
+  registry: Registry,
+  path: string[] = [],
+) {
+  const {type, sublayers} = layer;
+  const Component = registry[type];
+
+  // If layer has a render method, show it as the children of the layer
+  // TODO: handle child arrays?
+  if (Component && Component.render && typeof Component.render === 'object') {
+    return {
+      ...layer,
+      path,
+      sublayers: [
+        flattenTree(Component.render, registry, [...path, layer.key]),
+      ],
+    };
+  } else if (sublayers) {
+    return {
+      ...layer,
+      path,
+      sublayers: sublayers.map(sub =>
+        flattenTree(sub, registry, [...path, layer.key]),
+      ),
+    };
+  } else {
+    return layer;
+  }
+}

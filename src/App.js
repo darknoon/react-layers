@@ -136,9 +136,9 @@ export default class App extends Component<void, AppState> {
   render() {
     const {selection, currentComponent, registry} = this.state;
 
-    // Stay focused on app
-    const component = registry[currentComponent];
-    const tree = component.render;
+    // Grab component we're supposed to be rendering currently
+    const Component = registry[currentComponent];
+    const tree = Component.render;
 
     const root = registry.Canvas.render;
 
@@ -146,23 +146,22 @@ export default class App extends Component<void, AppState> {
       <Wrapper>
         <LayerList
           root={tree}
+          registry={registry}
+          selection={selection}
           onSelect={this.selectLayer}
           onToggleVisibility={this.onToggleVisibility}
           onFocusComponent={this.onFocusComponent}
-          selection={selection}
         />
         <Canvas
           root={root}
           registry={registry}
-          onSelect={this.selectLayer}
           selection={selection}
+          onSelect={this.selectLayer}
         />
-        {tree ? (
-          <Properties
-            inspectedLayers={findSelectedLayers(tree, selection)}
-            onSetLayerStyle={this.setLayerStyle}
-          />
-        ) : null}
+        <Properties
+          inspectedLayers={findSelectedLayers(tree, selection)}
+          onSetLayerStyle={this.setLayerStyle}
+        />
       </Wrapper>
     );
   }

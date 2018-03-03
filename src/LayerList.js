@@ -3,6 +3,7 @@ import VisibilityIcon from './visibility-icon';
 import {highlight, layerListBackground} from './style/colors';
 import {Key} from 'ts-keycode-enum';
 import styled from 'styled-components';
+import {treeToRows, flattenTree} from './Model';
 
 const indentSize = 20;
 
@@ -29,6 +30,10 @@ const LayerType = styled.span`
   border-radius: 999px;
 `;
 
+const ListTitle = styled.p`
+  font-size: 100%;
+`;
+
 const Eye = styled.span`
   opacity: ${({rowHovered}) => (rowHovered ? 0.5 : 0)};
   :hover {
@@ -36,7 +41,9 @@ const Eye = styled.span`
   }
 `;
 
-const Indent = styled.span`width: ${props => props.width}px;`;
+const Indent = styled.span`
+  width: ${props => props.width}px;
+`;
 
 class LayerItem extends PureComponent {
   state = {hovered: false};
@@ -74,19 +81,6 @@ class LayerItem extends PureComponent {
       </LayerItemWrapper>
     );
   }
-}
-
-function treeToRows(l: Layer) {
-  const rowForLayer = (layer: Layer, indent: number) => ({indent, layer});
-
-  const recur = (layer: Layer, indent: number): Row[] => {
-    return (layer.sublayers || []).reduce(
-      (arr, sublayer) => arr.concat(recur(sublayer, indent + 1)),
-      layer !== l ? [rowForLayer(layer, indent)] : [],
-    );
-  };
-
-  return recur(l, -1);
 }
 
 const Wrapper = styled.div`
@@ -145,8 +139,9 @@ export default class LayerList extends PureComponent {
 
   // TODO: memoize
   rows() {
-    const {root} = this.props;
-    const rows = treeToRows(root);
+    const {root, registry} = this.props;
+    const rendered = flattenTree(root, registry);
+    const rows = treeToRows(rendered);
     return rows;
   }
 
@@ -155,12 +150,17 @@ export default class LayerList extends PureComponent {
     const rows = this.rows();
     const selectedIndex = rows.findIndex(row => selection.has(row.layer.key));
 
+    const {layer: selectedLayer} = rows.find(row =>
+      selection.has(row.layer.key),
+    );
+
     return (
       <Wrapper
         onMouseDown={e => this.selectLayer(new Set())}
         onKeyDown={this.onKeyDown}
         tabIndex={0}
       >
+        <ListTitle>{root.name}</ListTitle>
         {rows.map(({layer: l, indent}) => (
           <LayerItem
             name={l.name}
