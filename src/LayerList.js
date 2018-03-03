@@ -92,6 +92,7 @@ function treeToRows(l: Layer) {
 const Wrapper = styled.div`
   flex: 1;
   user-select: none;
+  background-color: ${layerListBackground};
 `;
 
 export default class LayerList extends PureComponent {
@@ -104,16 +105,32 @@ export default class LayerList extends PureComponent {
   };
 
   onKeyDown = (e: KeyboardEvent) => {
-    if (e.keyCode === Key.UpArrow) {
+    const {onFocusComponent} = this.props;
+    const {keyCode, metaKey} = e;
+    if (keyCode === Key.UpArrow && !metaKey) {
       this.onNavigate(-1);
       e.stopPropagation();
-    } else if (e.keyCode === Key.DownArrow) {
+    } else if (keyCode === Key.DownArrow && !metaKey) {
       this.onNavigate(1);
+      e.stopPropagation();
+    } else if (
+      keyCode === Key.Enter ||
+      (keyCode === Key.DownArrow && metaKey)
+    ) {
+      const {selection, onFocusComponent} = this.props;
+      const selected = selection.values().next().value;
+      if (selected) {
+        onFocusComponent(selected);
+      }
+      e.stopPropagation();
+    } else if (keyCode === Key.UpArrow && metaKey) {
+      console.log('onfocus null');
+      onFocusComponent(null);
       e.stopPropagation();
     }
   };
 
-  onNavigate = direction => {
+  onNavigate = (direction: -1 | 1) => {
     const {selection} = this.props;
     const rows = this.rows();
     const selectedIndex = rows.findIndex(row => selection.has(row.layer.key));
@@ -143,7 +160,6 @@ export default class LayerList extends PureComponent {
         onMouseDown={e => this.selectLayer(new Set())}
         onKeyDown={this.onKeyDown}
         tabIndex={0}
-        style={{backgroundColor: layerListBackground}}
       >
         {rows.map(({layer: l, indent}) => (
           <LayerItem
