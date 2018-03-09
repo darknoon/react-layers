@@ -30,7 +30,7 @@ const LayerType = styled.span`
   border-radius: 999px;
 `;
 
-const ListTitle = styled.p`
+const ListTitle = styled.h2`
   font-size: 100%;
 `;
 
@@ -140,8 +140,8 @@ export default class LayerList extends PureComponent {
   // TODO: memoize
   rows() {
     const {root, registry} = this.props;
-    const rendered = flattenTree(root, registry);
-    const rows = treeToRows(rendered);
+    // const rendered = flattenTree(root, registry);
+    const rows = treeToRows(root);
     return rows;
   }
 
@@ -150,9 +150,8 @@ export default class LayerList extends PureComponent {
     const rows = this.rows();
     const selectedIndex = rows.findIndex(row => selection.has(row.layer.key));
 
-    const {layer: selectedLayer} = rows.find(row =>
-      selection.has(row.layer.key),
-    );
+    const {layer: selectedLayer} =
+      rows.find(row => selection.has(row.layer.key)) || {};
 
     return (
       <Wrapper
@@ -160,7 +159,6 @@ export default class LayerList extends PureComponent {
         onKeyDown={this.onKeyDown}
         tabIndex={0}
       >
-        <ListTitle>{root.name}</ListTitle>
         {rows.map(({layer: l, indent}) => (
           <LayerItem
             name={l.name}

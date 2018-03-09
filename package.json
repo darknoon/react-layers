@@ -4,6 +4,7 @@
   "private": true,
   "devDependencies": {
     "flow-bin": "^0.57.3",
+    "raf": "^3.4.0",
     "react-scripts": "1.0.14"
   },
   "dependencies": {

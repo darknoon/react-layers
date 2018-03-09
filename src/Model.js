@@ -7,7 +7,7 @@ export type Layer = {|
   sublayers?: [Layer],
   // TODO: remove this, make text nodes a thing
   content?: string,
-  style: {[k: string]: any},
+  style?: {[k: string]: any},
 |};
 
 type PropType = 'string' | 'length' | 'color';
@@ -85,6 +85,7 @@ export const defaultRegistry: Registry = {
   TitledGridTitle: {
     render: {
       type: 'p',
+      key: 'aaaoeu',
       name: 'Sub 1',
       content: 'My text goes here',
     },
@@ -135,7 +136,7 @@ export function flattenTree(
   registry: Registry,
   path: string[] = [],
 ) {
-  const {type, sublayers} = layer;
+  const {type, key, sublayers} = layer;
   const Component = registry[type];
 
   // If layer has a render method, show it as the children of the layer
@@ -143,7 +144,7 @@ export function flattenTree(
   if (Component && Component.render && typeof Component.render === 'object') {
     return {
       ...layer,
-      path,
+      key: [...path, layer.key].join('/'),
       sublayers: [
         flattenTree(Component.render, registry, [...path, layer.key]),
       ],
@@ -151,7 +152,7 @@ export function flattenTree(
   } else if (sublayers) {
     return {
       ...layer,
-      path,
+      key: [...path, layer.key].join('/'),
       sublayers: sublayers.map(sub =>
         flattenTree(sub, registry, [...path, layer.key]),
       ),
